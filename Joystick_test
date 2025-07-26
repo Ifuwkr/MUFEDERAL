@@ -1,0 +1,31 @@
+#define VRX_PIN  34 // ESP32 pin GPIO39 (ADC3) connected to VRX pin
+#define VRY_PIN  35 // ESP32 pin GPIO36 (ADC0) connected to VRY pin
+
+int valueX = 0; // to store the X-axis value
+int valueY = 0; // to store the Y-axis value
+
+void setup() {
+  Serial.begin(9600);
+
+  // Set the ADC attenuation to 11 dB (up to ~3.3V input)
+  analogSetAttenuation(ADC_11db);
+}
+
+void loop() {
+  // read X and Y analog values
+  valueX = analogRead(VRX_PIN);
+  valueY = analogRead(VRY_PIN);
+
+  int mappedX = map(valueX, 0, 4095, -255, 255);
+  int mappedY = map(valueY, 0, 4095, -255, 255);
+
+  int deadzone = 35;
+
+  if (abs(mappedX) < deadzone) mappedX = 0;
+  if (abs(mappedY) < deadzone) mappedY = 0;
+
+
+  Serial.print("X: "); Serial.print(mappedX);
+  Serial.print(" | Y: "); Serial.println(mappedY);
+  delay(300);
+}
