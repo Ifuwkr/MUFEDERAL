@@ -1,0 +1,27 @@
+// Potentiometer is connected to GPIO 34 (Analog ADC1_CH6) 
+const int potPin = 34;
+
+// variables
+int potRaw = 0;
+int potMapped = 0;
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+}
+
+void loop() {
+  // Read raw potentiometer value (0 - 4095)
+  potRaw = analogRead(potPin);
+
+  // Map the value to range 500 - 2500
+  potMapped = map(potRaw, 0, 4095, 500, 2500);
+
+  // Print both values for reference
+  Serial.print("Raw: ");
+  Serial.print(potRaw);
+  Serial.print(" | Mapped: ");
+  Serial.println(potMapped);
+
+  delay(500);
+}
