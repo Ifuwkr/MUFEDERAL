@@ -12,12 +12,15 @@
 #define EN3 22
 #define EN4 23
 
-Servo myServo;
-const int servoPin = 13;
+Servo kiskac;
+Servo dirsek;
+const int kiskacPin = 16;
+const int dirsekPin = 17;
 
 // Gönderici ile aynı veri yapısı tanımı
 typedef struct {
-  int pot;
+  int pot1;
+  int pot2;
   int x;
   int y;
 } KontrolVerisi;
@@ -28,8 +31,11 @@ void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_AP);
 
-  myServo.setPeriodHertz(50); // 50 Hz PWM
-  myServo.attach(servoPin, 500, 2500); // Min–Max mikro saniye aralığı
+  kiskac.setPeriodHertz(50); // 50 Hz PWM
+  kiskac.attach(kiskacPin, 500, 2500); // Min–Max mikro saniye aralığı
+
+  dirsek.setPeriodHertz(50); // 50 Hz PWM
+  dirsek.attach(dirsekPin, 500, 2500); // Min–Max mikro saniye aralığı
 
   pinMode(RPWM1, OUTPUT);
   pinMode(LPWM1, OUTPUT);
@@ -66,7 +72,8 @@ void OnDataRecv(const esp_now_recv_info_t *info, const uint8_t *data, int len) {
     memcpy(&gelenVeri, data, sizeof(KontrolVerisi));
 
     // Verileri yazdır
-    Serial.print("Potansiyometre: "); Serial.print(gelenVeri.pot);
+    Serial.print("kiskac: "); Serial.print(gelenVeri.pot1);
+    Serial.print("dirsek: "); Serial.print(gelenVeri.pot2);
     Serial.print(" | X: "); Serial.print(gelenVeri.x);
     Serial.print(" | Y: "); Serial.println(gelenVeri.y);
   } else {
@@ -74,7 +81,8 @@ void OnDataRecv(const esp_now_recv_info_t *info, const uint8_t *data, int len) {
   }
   
   hareket(gelenVeri.x, gelenVeri.y);
-  servo(gelenVeri.pot);
+  kiskacFun(gelenVeri.pot1);
+  dirsekFun(gelenVeri.pot2);
 }
 
 void hareket(int x, int y) {
@@ -108,10 +116,18 @@ void hareket(int x, int y) {
   }
 }
 
-void servo(int pot) {
-  pot = constrain(pot, 500, 2500);
+void kiskacFun(int pot1) {
+  pot1 = constrain(pot1, 500, 2500);
 
-  myServo.writeMicroseconds(pot);
+  kiskac.writeMicroseconds(pot1);
   Serial.print("Gelen PWM: ");
-  Serial.println(pot);
+  Serial.println(pot1);
+}
+
+void dirsekFun(int pot2) {
+  pot2 = constrain(pot2, 500, 2500);
+
+  dirsek.writeMicroseconds(pot2);
+  Serial.print("Gelen PWM: ");
+  Serial.println(pot2);
 }
